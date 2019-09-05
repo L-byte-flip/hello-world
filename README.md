@@ -1,85 +1,56 @@
-# Welcome to L-byte World
+Quiet.js
+===========
 
-# Repositories
+[![Quiet Modem Chat](https://discordapp.com/api/guilds/290985648054206464/embed.png?style=shield)](https://discordapp.com/invite/eRw5UjF)
 
-This repository contains three important files: The HTML code for your first website on GitHub, the CSS stylesheet that decorates your website with colors and fonts, and the **README** file. It also contains an image folder, with one image file.
+**[Documentation](https://quiet.github.io/quiet-js/docs/Quiet.html)**
 
-## Describe your project
-A cool player
+This is a javascript binding for [libquiet](https://github.com/quiet/quiet), a library for sending and receiving data via sound card. It can function either via speaker or cable (e.g., 3.5mm). Quiet comes included with a few transmissions profiles which configure quiet's transmitter and receiver. For speaker transmission, there is a profile which transmits around the 19kHz range, which is essentially imperceptible to people (nearly ultrasonic). For transmission via cable, quiet.js has profiles which offer speeds of at least 40 kbps.
 
-[Learn more about READMEs](https://help.github.com/en/articles/about-readmes)
+Try it out in this [live example](https://quiet.github.io/quiet-js/).
 
-## Your first website
+Compatibility
+--------
+| Browser           | Transmitter             | Receiver                           |
+| ------------------|-------------------------|------------------------------------|
+| Chrome            | *Supported*             | *Supported*<sup>1</sup>            |
+| Chrome (Android)  | *Supported*             | *Partially Supported*<sup>1,2</sup>|
+| Edge              | *Supported*             | *Supported*                        |
+| Firefox           | *Supported*             | *Partially Supported*<sup>3</sup>  |
+| Firefox (Android) | *Supported*             | *Partially Supported*<sup>2,3</sup>|
+| Internet Explorer | *Not Supported*         | *Not Supported*                    |
+| Safari            | *Supported*             | *Not Supported*<sup>4</sup>        |
+| Safari (iOS)      | *Supported*             | *Not Supported*<sup>4</sup>        |
 
-**GitHub Pages** is a free and easy way to create a website using the code that lives in your GitHub repositories. You can use GitHub Pages to build a portfolio of your work, create a personal website, or share a fun project that you coded with the world. GitHub Pages is automatically enabled in this repository, but when you create new repositories in the future, the steps to launch a GitHub Pages website will be slightly different.
+[1]: For Chrome receivers, the page *must* be delivered via https. Chrome does not support microphone input without TLS.
 
-[Learn more about GitHub Pages](https://pages.github.com/)
+[2]: GMSK profiles only
 
-## Rename this repository to publish your site
+[3]: Firefox's WebAudio implementation resamples audio input to 32kHz, which limits all audio received to 16kHz and below. This means the ultrasonic profile cannot be used for Firefox receivers. Additionally, the resampler used by Firefox produces strong audio distortion, which makes reception by some profiles difficult. However, the audible profiles work well. For the most recent information on this limitation, refer to [Bug 953265](https://bugzilla.mozilla.org/show_bug.cgi?id=953265).
 
-We've already set-up a GitHub Pages website for you, based on your personal username. This repository is called `hello-world`, but you'll rename it to: `username.github.io`, to match your website's URL address. If the first part of the repository doesn’t exactly match your username, it won’t work, so make sure to get it right.
+[4]: Safari does not support `getUserMedia` or microphone input in any capacity.
 
-Let's get started! To update this repository’s name, click the `Settings` tab on this page. This will take you to your repository’s settings page. 
+Usage
+--------
+The full documentation is available [here](http://quiet.github.io/quiet-js/docs/).
 
-![repo-settings-image](https://user-images.githubusercontent.com/18093541/63130482-99e6ad80-bf88-11e9-99a1-d3cf1660b47e.png)
-
-Under the **Repository Name** heading, type: `username.github.io`, where username is your username on GitHub. Then click **Rename**—and that’s it. When you’re done, click your repository name or browser’s back button to return to this page.
-
-<img width="1039" alt="rename_screenshot" src="https://user-images.githubusercontent.com/18093541/63129466-956cc580-bf85-11e9-92d8-b028dd483fa5.png">
-
-Once you click **Rename**, your website will automatically be published at: https://your-username.github.io/. The HTML file—called `index.html`—is rendered as the home page and you'll be making changes to this file in the next step.
-
-Congratulations! You just launched your first GitHub Pages website. It's now live to share with the entire world
-
-## Making your first edit
-
-When you make any change to any file in your project, you’re making a **commit**. If you fix a typo, update a filename, or edit your code, you can add it to GitHub as a commit. Your commits represent your project’s entire history—and they’re all saved in your project’s repository.
-
-With each commit, you have the opportunity to write a **commit message**, a short, meaningful comment describing the change you’re making to a file. So you always know exactly what changed, no matter when you return to a commit.
-
-## Practice: Customize your first GitHub website by writing HTML code
-
-Want to edit the site you just published? Let’s practice commits by introducing yourself in your `index.html` file. Don’t worry about getting it right the first time—you can always build on your introduction later.
-
-Let’s start with this template:
+Quiet-js includes a blob of libquiet compiled by emscripten as well as a javascript binding for ease of use. The bindings must be loaded before the compiled portion. Below is the recommended way to include Quiet in your project.
 
 ```
-<p>Hello World! I’m [username]. This is my website!</p>
+    <script type="text/javascript" src="quiet.js"></script>
+    <script type="text/javascript" src="your_project.js"></script>
+    <script async type="text/javascript" src="quiet-emscripten.js"></script>
 ```
 
-To add your introduction, copy our template and click the edit pencil icon at the top right hand corner of the `index.html` file.
+Additionally, the emscripten compiled portion requires a memory initializer, `quiet-emscripten.js.mem`. This is loaded asynchronously by `quiet-emscripten.js`.
 
-<img width="997" alt="edit-this-file" src="https://user-images.githubusercontent.com/18093541/63131820-0794d880-bf8d-11e9-8b3d-c096355e9389.png">
+**It is strongly recommended to also include libfec.js. An emscripten-compiled version of libfec may be found [here](https://github.com/quiet/libfec/releases) or with `npm install libfec`.** If libfec is not included, then quiet.js will not be able to use any profiles which use convolutional codes or Reed-Solomon error correction.
 
-
-Delete this placeholder line:
-
-```
-<p>Welcome to your first GitHub Pages website!</p>
-```
-
-Then, paste the template to line 15 and fill in the blanks.
-
-<img width="1032" alt="edit-githuboctocat-index" src="https://user-images.githubusercontent.com/18093541/63132339-c3a2d300-bf8e-11e9-8222-59c2702f6c42.png">
+For a complete example demonstrating ultrasonic text transmission and reception, see [this example](https://github.com/quiet/quiet-js/tree/master/examples/text).
 
 
-When you’re done, scroll down to the `Commit changes` section near the bottom of the edit page. Add a short message explaining your change, like "Add my introduction", then click `Commit changes`.
+License
+--------
+Quiet and Quiet-js are licensed under 3-clause BSD. Quiet-js's emscripten-compiled output includes a statically-linked copies of [liquid dsp](http://liquidsdr.org/) and [libjansson](http://www.digip.org/jansson/), both of which are licensed under the MIT license. For more information on Quiet-js's 3rd party licenses, consult [LICENSE-3RD-PARTY](https://github.com/quiet/quiet-js/blob/master/LICENSE-3RD-PARTY).
 
-
-<img width="1030" alt="add-my-username" src="https://user-images.githubusercontent.com/18093541/63131801-efbd5480-bf8c-11e9-9806-89273f027d16.png">
-
-Once you click `Commit changes`, your changes will automatically be published on your GitHub Pages website. Refresh the page to see your new changes live in action.
-
-:tada: You just made your first commit! :tada:
-
-## Extra Credit: Keep on building!
-
-Change the placeholder Octocat gif on your GitHub Pages website by [creating your own personal Octocat emoji](https://myoctocat.com/build-your-octocat/) or [choose a different Octocat gif from our logo library here](https://octodex.github.com/). Add that image to line 12 of your `index.html` file, in place of the `<img src=` link.
-
-Want to add even more code and fun styles to your GitHub Pages website? [Follow these instructions](https://github.com/github/personal-website) to build a fully-fledged static website.
-
-![octocat](./images/create-octocat.png)
-
-## Everything you need to know about GitHub
-
-Getting started is the hardest part. If there’s anything you’d like to know as you get started with GitHub, try searching [GitHub Help](https://help.github.com). Our documentation has tutorials on everything from changing your repository settings to configuring GitHub from your command line.
+Additionally, it is strongly recommended to link [libfec](http://www.ka9q.net/code/fec/) (`npm install libfec`). libfec is licensed under LGPL. It is the intention of this project to adhere to the provisions of LGPL by dynamically linking libfec. However, neither this statement nor any other statements in these projects may be construed as legal advice from the author. It is solely the user's responsibility to ensure their own compliance with all applicable licenses.
